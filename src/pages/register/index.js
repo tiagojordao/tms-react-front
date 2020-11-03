@@ -31,7 +31,7 @@ export default function Register() {
             Cookies.set('@TMS-ID', response.data.id);
             console.log(response);
             alert(`Cadastro Realizado!`);
-            window.location.replace("http://localhost:3000/user");
+            window.location.replace("http://localhost:3000/usertickets");
         }
     })
   }

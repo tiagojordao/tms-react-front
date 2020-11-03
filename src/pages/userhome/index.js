@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 import Cookies from 'js-cookie';
 
@@ -6,12 +7,10 @@ import axios from 'axios';
 
 import { Container } from './styles';
 
+import { MdDelete } from 'react-icons/md';
+
 import { makeStyles } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 
 const useStyles = makeStyles({
@@ -31,34 +30,24 @@ const useStyles = makeStyles({
   pos: {
     marginBottom: 12,
   },
-  aberto: {
-    backgroundColor: '#4AC744',
-    marginRight: 4,
-  },
-  andamento: {
-    backgroundColor: '#F0A11B',
-    marginRight: 4,
-  },
-  fechado: {
-    backgroundColor: '#F02A1D',
-    marginRight: 4,
-  },
 });
 
 export default function Userhome() {
 
   const classes = useStyles();
-  const bull = <span className={classes.bullet}>•</span>;
 
   const [userid, setUserid] = useState();
   const [username, setUsername] = useState('');
+
   const [tickets, setTickets] = useState([]);
   const [comment, setComment] = useState([]);
 
+  // Pegar ID nos Cookies e salvar no Estado
   useEffect (() => {
     setUserid(Cookies.get('@TMS-ID'));
   },[]);
 
+  // Salvar nome do usuário no Estado
   useEffect (() => {
     async function getUser () {
       const response = await axios ({
@@ -70,24 +59,25 @@ export default function Userhome() {
     getUser();
   },[userid]);
 
-  useEffect (() => {
-    async function getTickets () {
+  // Pegar todos os tickets
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect (async () => {
       const response = await axios ({
         method: 'GET',
         url: `http://localhost:8080/ticket`,
       })
-      setTickets(tickets => [...tickets, ...response.data]);
-    }
-    getTickets();
-    
+      // setTickets(tickets => [...tickets, ...response.data]);
+      setTickets(tickets => response.data);
   },[]);
 
+  // Atualizar campo de comentário
   const handleChange = index => e => {
     let array = [...comment];
     array[index] = [e.target.value];
     setComment(array);
   }
 
+  // Enviar Comentário
   async function sendComment (index, ticketid) {
     var body = {
       user: ticketid,
@@ -104,6 +94,7 @@ export default function Userhome() {
     }
   }
 
+  // Trocar para Em Atendimento
   async function handleAssing (index, ticketid) {
     var body = {
       ticketId: ticketid,
@@ -114,16 +105,15 @@ export default function Userhome() {
       url: `http://localhost:8080/ticket/${ticketid}/assign/${userid}`,
       data: body
     })
+    console.log(response);
   }
+  useEffect(() => {},[tickets]);
 
+  // Fechar Ticket
   async function handleClose (index, ticketid){
-    var body = {
-      id: ticketid,
-    }
     const response = await axios ({
       method: 'POST',
-      url:`http://localhost:8080/ticket/${ticketid}/close`,
-      data: body
+      url:`http://localhost:8080/ticket/${ticketid}/close`
     })
   }
 
@@ -131,10 +121,11 @@ export default function Userhome() {
     <Container>
       <div id="userhome-page">
         <header id="nav">
-          <div className="content menublock">
+          <div className="menublock">
             <h1 className="title">TMS</h1>
             <div className="menu">
-              {/* <Link to='#'>CHAMADOS</Link> */}
+              <Link to="/report">RELATÓRIOS</Link>
+              <Link to='/usertickets'>CHAMADOS</Link>
             </div>
           </div>
         </header>
@@ -142,34 +133,86 @@ export default function Userhome() {
           <main>
               <h1>Olá {username}</h1>
             <div className="tickets">
-              {/* {tickets && tickets.map(ticket => <div key={ticket.id}>{ticket.description}</div>)} */}
-              {tickets && tickets.map((ticket, index) => 
-                <Card id={ticket.id} className={classes.root} variant="outlined">
-                  <CardContent>
-                    <Typography className={classes.title} color="textSecondary" gutterBottom>
-                      {bull}{ticket.task}
-                    </Typography>
-                    <Typography className={classes.pos} color="textSecondary">
-                      {ticket.description}
-                    </Typography>
-                    <Button className={classes.aberto} variant="body2" component="p">
-                      ABERTO
-                    </Button>
-                    <Button className={classes.andamento} onClick={() => handleAssing(index, ticket.id)} variant="body2" component="p">
-                      EM ANDAMENTO
-                    </Button>
-                    <Button className={classes.fechado} onClick={() => handleClose(index, ticket.id)} variant="body2" component="p">
-                      FECHADO
-                    </Button>
-                  </CardContent>
-                  <CardContent>
-                    <TextField key={index} label="Comentário" variant="outlined" value={comment[index]} onChange={handleChange(index)} fullWidth/>
-                  </CardContent>
-                  <CardActions>
-                    <Button size="small" onClick={() => sendComment(index, ticket.id)}>Enviar Comentário</Button>
-                  </CardActions>
-                </Card>
-              )}
+              <div className="opentickets">
+                <header>
+                  <h2>Tickets Abertos</h2>
+                </header>
+                <ul className="open-ticket-ul">
+                  {tickets && tickets.map((t, index) => t.status === "ABERTO" ? 
+                    <li key={t.id}>
+                      <div className="open-block">
+                        <div className="content-box">
+                          Tarefa: 
+                          {t.task}<br/><br/>
+                          Descrição: 
+                          {t.description}
+                        </div>
+                        <span>
+                          <button id="check" onClick={() => handleAssing(index, t.id)}>ATENDER</button>
+                        </span>
+                      </div>
+                      <div className="textfield-box">
+                        <TextField key={index} label="Comentário" variant="outlined" value={comment[index]} onChange={handleChange(index)} fullWidth/>
+                        <Button size="small" onClick={() => sendComment(index, t.id)}>Enviar Comentário</Button>
+                      </div>
+                    </li>
+                  : null)}
+                </ul>
+              </div>
+
+              <div className="currenttickets">
+                <header>
+                  <h2>Tickets Em Atendimento</h2>
+                </header>
+                <ul className="current-ticket-ul">
+                  {tickets && tickets.map((t, index) => t.status === "EM_ATENDIMENTO" ? 
+                    <li key={t.id}>
+                    <div className="current-block">
+                      <div className="content-box">
+                        Tarefa: 
+                        {t.task}<br/><br/>
+                        Descrição: 
+                        {t.description}
+                      </div>
+                      <span>
+                        <button id="check" onClick={() => handleClose(index, t.id)}>ENCERRAR</button>
+                      </span>
+                    </div>
+                    <div className="textfield-box">
+                      <TextField key={index} label="Comentário" variant="outlined" value={comment[index]} onChange={handleChange(index)} fullWidth/>
+                      <Button size="small" onClick={() => sendComment(index, t.id)}>Enviar Comentário</Button>
+                    </div>
+                  </li>
+                  : null)}
+                </ul>
+              </div>
+
+              <div className="closedtickets">
+                <header>
+                  <h2>Tickets Encerrados</h2>
+                </header>
+                <ul className="closed-ticket-ul">
+                  {tickets && tickets.map((t, index) => t.status === "FECHADO" ? 
+                    <li key={t.id}>
+                      <div className="closed-block">
+                        <div className="content-box">
+                          Tarefa: 
+                          {t.task}<br/><br/>
+                          Descrição: 
+                          {t.description}
+                        </div>
+                        <span>
+                          <button id="check" onClick={() => {}}><MdDelete size={16}/></button>
+                        </span>
+                      </div>
+                      {/* <div className="textfield-box">
+                        <TextField key={index} label="Comentário" variant="outlined" value={comment[index]} onChange={handleChange(index)} fullWidth/>
+                        <Button size="small" onClick={() => sendComment(index, t.id)}>Enviar Comentário</Button>
+                      </div> */}
+                    </li>
+                  : null)}
+                </ul>
+              </div>
             </div>
           </main>
         </div>
