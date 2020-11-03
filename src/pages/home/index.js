@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {Link} from 'react-router-dom';
 
 import { Container } from './styles';
@@ -21,7 +21,8 @@ export default function Home () {
               <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)}/>
               <input type="password" placeholder="Senha" value={password} onChange={e => setPassword(e.target.value)}/>
               <div className="buttons">
-                <button className="login-button">ENTRAR</button>
+                <Link id="login" to='/report'>ENTRAR</Link>
+                {/* <button className="login-button">ENTRAR</button> */}
                 <Link to='/register'>CADASTRO</Link>
               </div>
             </fieldset>

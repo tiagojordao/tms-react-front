@@ -3,6 +3,7 @@ import styled from 'styled-components';
 export const Container = styled.div`
   #register-page {
   height: 100vh;
+  background: #333;
   }
 
   #register-page .content {

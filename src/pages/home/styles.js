@@ -5,6 +5,7 @@ export const Container = styled.div`
 
 #login-page {
   height: 100vh;
+  background: #333;
   }
 
   #login-page .content {
@@ -73,7 +74,7 @@ export const Container = styled.div`
     flex-direction: row;
   }
 
-  #login-page .content main fieldset .buttons button {
+  #login-page .content main fieldset .buttons #login {
     width: 100%;
     padding: 13px 0px 13px 0px;
     margin-right: 4px;
@@ -93,7 +94,7 @@ export const Container = styled.div`
     text-align: center;
   }
 
-  #login-page .content main fieldset button:hover {
+  #login-page .content main fieldset #login:hover {
     background-color: rgba(59,201,30,0.5);
   }
   #login-page .content main fieldset a:hover {
