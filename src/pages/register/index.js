@@ -28,10 +28,7 @@ export default function Register() {
         data: body
     }).then (response => {
         if (response.status === 200){
-            Cookies.set('@TMS-ID', response.data.id);
-            console.log(response);
-            alert(`Cadastro Realizado!`);
-            window.location.replace("http://localhost:3000/usertickets");
+            window.location.replace("http://localhost:3000/");
         }
     })
   }

@@ -36,8 +36,8 @@ export default function Home () {
           'Authorization': response.data,
         }
       });
-      Cookies.set('@tms-id', JSON.parse(resp.data).id);
-      Cookies.set('@tms-name', JSON.parse(resp.data).name);
+      Cookies.set('@tms-id', resp.data.id);
+      Cookies.set('@tms-name', resp.data.name);
       window.location.replace("http://localhost:3000/report");
     } catch (e) {
       console.log(e);

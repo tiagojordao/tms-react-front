@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+import Cookies from 'js-cookie';
+
 import axios from 'axios';
 
 import { Link } from 'react-router-dom';
@@ -16,7 +18,10 @@ export default function Report() {
     async function getTickets () {
       const response = await axios ({
         method: 'GET',
-        url: `http://localhost:8080/reports/tickets`
+        url: `http://localhost:8080/reports/tickets`,
+        headers: {
+          'Authorization': Cookies.get('@tms-token')
+        }
       })
       setChamados(response.data);
     }
@@ -24,7 +29,10 @@ export default function Report() {
     async function getClassroom () {
       const response = await axios ({
         method: 'GET',
-        url: `http://localhost:8080/reports/classroom`
+        url: `http://localhost:8080/reports/classroom`,
+        headers: {
+          'Authorization': Cookies.get('@tms-token')
+        }
       })
       setClassroom(response.data);
     }
@@ -32,7 +40,10 @@ export default function Report() {
     async function getMaterial () {
       const response = await axios ({
         method: 'GET',
-        url: `http://localhost:8080/reports/material`
+        url: `http://localhost:8080/reports/material`,
+        headers: {
+          'Authorization': Cookies.get('@tms-token')
+        }
       })
       setMateriais(response.data);
     }

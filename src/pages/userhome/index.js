@@ -34,8 +34,6 @@ const useStyles = makeStyles({
 
 export default function Userhome() {
 
-  const classes = useStyles();
-
   const [userid, setUserid] = useState();
   const [username, setUsername] = useState('');
 
@@ -52,7 +50,10 @@ export default function Userhome() {
     async function getUser () {
       const response = await axios ({
         method: 'GET',
-        url: `http://localhost:8080/user/${userid}`
+        url: `http://localhost:8080/user/${userid}`,
+        headers: {
+          'Authorization': Cookies.get('@tms-token')
+        }
       })
       setUsername(response.data.name);
     }
@@ -65,6 +66,9 @@ export default function Userhome() {
       const response = await axios ({
         method: 'GET',
         url: `http://localhost:8080/ticket`,
+        headers: {
+          'Authorization': Cookies.get('@tms-token')
+        }
       })
       // setTickets(tickets => [...tickets, ...response.data]);
       setTickets(tickets => response.data);
@@ -80,14 +84,16 @@ export default function Userhome() {
   // Enviar Comentário
   async function sendComment (index, ticketid) {
     var body = {
-      user: ticketid,
       comment: comment[index].toString(),
     }
     console.log(body)
     const response = await axios ({
       method: 'POST',
       url: `http://localhost:8080/ticket/${ticketid}/add-feedback`,
-      data: body
+      data: body,
+      headers: {
+        'Authorization': Cookies.get('@tms-token')
+      }
     })
     if(response.status === 200){
       alert('Feedback Enviado!');
@@ -96,14 +102,12 @@ export default function Userhome() {
 
   // Trocar para Em Atendimento
   async function handleAssing (index, ticketid) {
-    var body = {
-      ticketId: ticketid,
-      attendantUserId: userid 
-    }
     const response = await axios ({
       method: 'POST',
-      url: `http://localhost:8080/ticket/${ticketid}/assign/${userid}`,
-      data: body
+      url: `http://localhost:8080/ticket/${ticketid}/assign/`,
+      headers: {
+        'Authorization': Cookies.get('@tms-token'),
+      }
     })
     console.log(response);
   }
@@ -113,7 +117,10 @@ export default function Userhome() {
   async function handleClose (index, ticketid){
     const response = await axios ({
       method: 'POST',
-      url:`http://localhost:8080/ticket/${ticketid}/close`
+      url:`http://localhost:8080/ticket/${ticketid}/close`,
+      headers: {
+        'Authorization': Cookies.get('@tms-token')
+      }
     })
   }
 
@@ -131,7 +138,7 @@ export default function Userhome() {
         </header>
         <div className="content">
           <main>
-              <h1>Olá {username}</h1>
+              <h1>Olá {Cookies.get('@tms-name')}</h1>
             <div className="tickets">
               <div className="opentickets">
                 <header>
